@@ -3,10 +3,14 @@ from numpy import float32, zeros,  uint8, shape, array, squeeze
 from cv2 import VideoCapture, getPerspectiveTransform, warpPerspective, line, circle, rectangle, perspectiveTransform
 from TraceHeader import videoFile, checkPath
 
-video = VideoCapture(videoFile)
-checkPath(videoFile)
-frameWidth = int(video.get(3))
-frameHeight = int(video.get(4))
+# video = VideoCapture(videoFile)
+# checkPath(videoFile)
+# Note: Video initialization is handled in the main processing script
+# frameWidth = int(video.get(3))
+# frameHeight = int(video.get(4))
+# Default frame dimensions - will be set dynamically in processing
+frameWidth = 1920
+frameHeight = 1080
 
 widthP = int(967)
 heightP = int(1585)
