@@ -1,0 +1,102 @@
+{
+  "layouts": {
+    "espn": {
+      "name": "ESPN",
+      "description": "ESPN broadcast layout with centered scoreboard",
+      "relative_position": [0.25, 0.02, 0.5, 0.15],
+      "background_color": [0, 0, 0],
+      "text_color": [255, 255, 255],
+      "text_regions": {
+        "player1_name": [0.0, 0.1, 0.3, 0.3],
+        "player2_name": [0.0, 0.6, 0.3, 0.3],
+        "player1_score": [0.35, 0.1, 0.6, 0.3],
+        "player2_score": [0.35, 0.6, 0.6, 0.3]
+      }
+    },
+    "eurosport": {
+      "name": "Eurosport",
+      "description": "Eurosport broadcast layout with left-aligned scoreboard",
+      "relative_position": [0.02, 0.02, 0.4, 0.12],
+      "background_color": [30, 30, 30],
+      "text_color": [255, 255, 255],
+      "text_regions": {
+        "player1_name": [0.0, 0.1, 0.4, 0.4],
+        "player2_name": [0.0, 0.5, 0.4, 0.4],
+        "player1_score": [0.5, 0.1, 0.5, 0.4],
+        "player2_score": [0.5, 0.5, 0.5, 0.4]
+      }
+    },
+    "tennis_channel": {
+      "name": "Tennis Channel",
+      "description": "Tennis Channel broadcast layout",
+      "relative_position": [0.15, 0.02, 0.7, 0.1],
+      "background_color": [0, 50, 100],
+      "text_color": [255, 255, 255],
+      "text_regions": {
+        "player1_name": [0.0, 0.1, 0.25, 0.4],
+        "player2_name": [0.0, 0.5, 0.25, 0.4],
+        "player1_score": [0.3, 0.1, 0.7, 0.4],
+        "player2_score": [0.3, 0.5, 0.7, 0.4]
+      }
+    },
+    "generic_top": {
+      "name": "Generic Top",
+      "description": "Generic top-positioned scoreboard",
+      "relative_position": [0.1, 0.02, 0.8, 0.12],
+      "background_color": [0, 0, 0],
+      "text_color": [255, 255, 255],
+      "text_regions": {
+        "player1_name": [0.0, 0.1, 0.25, 0.4],
+        "player2_name": [0.0, 0.5, 0.25, 0.4],
+        "player1_score": [0.3, 0.1, 0.7, 0.4],
+        "player2_score": [0.3, 0.5, 0.7, 0.4]
+      }
+    },
+    "generic_bottom": {
+      "name": "Generic Bottom",
+      "description": "Generic bottom-positioned scoreboard",
+      "relative_position": [0.1, 0.85, 0.8, 0.12],
+      "background_color": [0, 0, 0],
+      "text_color": [255, 255, 255],
+      "text_regions": {
+        "player1_name": [0.0, 0.1, 0.25, 0.4],
+        "player2_name": [0.0, 0.5, 0.25, 0.4],
+        "player1_score": [0.3, 0.1, 0.7, 0.4],
+        "player2_score": [0.3, 0.5, 0.7, 0.4]
+      }
+    },
+    "generic_corner": {
+      "name": "Generic Corner",
+      "description": "Generic corner-positioned scoreboard",
+      "relative_position": [0.02, 0.02, 0.3, 0.15],
+      "background_color": [0, 0, 0],
+      "text_color": [255, 255, 255],
+      "text_regions": {
+        "player1_name": [0.0, 0.1, 0.4, 0.35],
+        "player2_name": [0.0, 0.55, 0.4, 0.35],
+        "player1_score": [0.45, 0.1, 0.55, 0.35],
+        "player2_score": [0.45, 0.55, 0.55, 0.35]
+      }
+    }
+  },
+  "detection_parameters": {
+    "min_text_regions": 2,
+    "min_text_width": 5,
+    "min_text_height": 8,
+    "max_text_width_ratio": 0.8,
+    "max_text_height_ratio": 0.6,
+    "text_aspect_ratio_min": 0.2,
+    "text_aspect_ratio_max": 8.0,
+    "confidence_threshold": 0.2
+  },
+  "ocr_parameters": {
+    "config": "--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ",
+    "min_resize_height": 50,
+    "bilateral_filter_d": 9,
+    "bilateral_filter_sigma_color": 75,
+    "bilateral_filter_sigma_space": 75,
+    "adaptive_threshold_max_value": 255,
+    "adaptive_threshold_block_size": 11,
+    "adaptive_threshold_c": 2
+  }
+}

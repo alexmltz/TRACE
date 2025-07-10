@@ -4,6 +4,7 @@ import numpy as np
 from BallDetection import BallDetector
 from BodyTracking import bodyMap
 from TraceHeader import calculatePixels
+from ScoreboardDetection import ScoreboardDetector, ScoreboardLayout, draw_scoreboard_detection
 from mediapipe import solutions
 
 def draw_ball_detection(frame, x, y, radius=8, color=(0, 255, 0), thickness=2):
@@ -59,9 +60,9 @@ class BodyTracker:
         self.x_avg = 0.0
         self.y_avg = 0.0
 
-def process_video(input_path, output_path, ball_detector):
+def process_video(input_path, output_path, ball_detector, enable_scoreboard=True):
     """
-    Process a single video file with ball detection and body tracking
+    Process a single video file with ball detection, body tracking, and scoreboard detection
     """
     print(f"Processing video: {input_path}")
     
@@ -95,9 +96,20 @@ def process_video(input_path, output_path, ball_detector):
     body1 = BodyTracker()
     body2 = BodyTracker()
     
+    # Initialize scoreboard detector
+    scoreboard_detector = None
+    if enable_scoreboard:
+        try:
+            scoreboard_detector = ScoreboardDetector()
+            print("  ✓ Scoreboard Detection initialized")
+        except Exception as e:
+            print(f"  ✗ Scoreboard Detection failed to initialize: {e}")
+            enable_scoreboard = False
+    
     frame_count = 0
     detections_count = 0
     body_detections = 0
+    scoreboard_detections = 0
     counter = 0
     n = 3  # smoothing frames
     
@@ -105,6 +117,10 @@ def process_video(input_path, output_path, ball_detector):
     print("  ✓ Ball Detection & Tracking")
     print("  ✓ Body Tracking (2 players)")
     print("  ✗ Court Detection (disabled)")
+    if enable_scoreboard:
+        print("  ✓ Scoreboard Detection & Score Tracking")
+    else:
+        print("  ✗ Scoreboard Detection (disabled)")
     
     try:
         while True:
@@ -176,6 +192,24 @@ def process_video(input_path, output_path, ball_detector):
                     cv2.circle(frame, (int(body1.x_avg), int(body1.y_avg)), 10, (0, 255, 255), -1)
                     cv2.circle(frame, (int(body2.x_avg), int(body2.y_avg)), 10, (255, 255, 0), -1)
             
+            # Scoreboard detection
+            current_score = None
+            scoreboard_regions = []
+            if enable_scoreboard and scoreboard_detector:
+                try:
+                    current_score = scoreboard_detector.detect_score(frame)
+                    scoreboard_regions = scoreboard_detector.get_scoreboard_regions(frame)
+                    
+                    if current_score and current_score.confidence > 0.3:
+                        scoreboard_detections += 1
+                        
+                        # Draw scoreboard detection visualization
+                        frame = draw_scoreboard_detection(frame, current_score, scoreboard_regions)
+                        
+                except Exception as e:
+                    if frame_count % 100 == 0:  # Only print occasionally to avoid spam
+                        print(f"Scoreboard detection error: {e}")
+            
             # Write frame to output video
             out.write(frame)
             
@@ -184,6 +218,8 @@ def process_video(input_path, output_path, ball_detector):
                 print(f"Processed {frame_count}/{total_frames} frames")
                 print(f"  Ball detections: {detections_count}")
                 print(f"  Body detections: {body_detections}")
+                if enable_scoreboard:
+                    print(f"  Scoreboard detections: {scoreboard_detections}")
     
     except Exception as e:
         print(f"Error during processing: {e}")
@@ -200,6 +236,8 @@ def process_video(input_path, output_path, ball_detector):
     print(f"Total frames: {frame_count}")
     print(f"Ball detections: {detections_count}")
     print(f"Body detections: {body_detections}")
+    if enable_scoreboard:
+        print(f"Scoreboard detections: {scoreboard_detections}")
     print(f"Output saved to: {output_path}")
     
     return True
@@ -239,6 +277,7 @@ def main():
     print("  ✓ Ball Detection & Tracking")
     print("  ✓ Body Tracking (2 players)")
     print("  ✗ Court Detection (disabled)")
+    print("  ✓ Scoreboard Detection & Score Tracking")
     
     # Initialize ball detector
     print("Initializing ball detector...")
