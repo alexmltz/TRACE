@@ -545,39 +545,56 @@ class ScoreboardDetector:
                 return self.score_history[-1]
             return None
         
-        # Detect scoreboard regions
+        # Try multiple regions to find the best tennis score
+        best_score = None
+        best_confidence = 0.0
+        
+        # Get primary regions
         regions = self.region_detector.detect_regions(frame, force_layout)
         
-        if not regions:
-            return None
+        # Also add manual bottom-left region for ATP Tennis TV
+        frame_height, frame_width = frame.shape[:2]
+        bottom_left_region = ScoreboardRegion(
+            x=int(0.02 * frame_width),
+            y=int(0.75 * frame_height), 
+            width=int(0.25 * frame_width),
+            height=int(0.2 * frame_height),
+            layout=ScoreboardLayout.TENNIS_CHANNEL,
+            confidence=0.7
+        )
+        regions.append(bottom_left_region)
         
-        # Process the highest confidence region
-        best_region = max(regions, key=lambda r: r.confidence)
+        # Test each region for tennis scores
+        for region in regions:
+            try:
+                roi = region.get_roi(frame)
+                text = self.text_recognizer.recognize_text(roi)
+                
+                if text:
+                    score_data = self.score_parser.parse_score_text(text, region.layout)
+                    
+                    if score_data and score_data.confidence > best_confidence:
+                        best_score = score_data
+                        best_confidence = score_data.confidence
+                        
+            except Exception as e:
+                # Continue to next region if this one fails
+                continue
         
-        # Extract text from the region
-        roi = best_region.get_roi(frame)
-        text = self.text_recognizer.recognize_text(roi)
-        
-        if not text:
-            return None
-        
-        # Parse the extracted text
-        score_data = self.score_parser.parse_score_text(text, best_region.layout)
-        
-        if score_data:
-            score_data.timestamp = self.frame_count
+        if best_score:
+            best_score.timestamp = self.frame_count
             
             # Apply temporal filtering for better accuracy
-            score_data = self._apply_temporal_filter(score_data)
+            best_score = self._apply_temporal_filter(best_score)
             
             # Store in history
-            self.score_history.append(score_data)
+            self.score_history.append(best_score)
             
             # Keep only recent history
             if len(self.score_history) > 10:
                 self.score_history = self.score_history[-10:]
             
-            return score_data
+            return best_score
         
         return None
     
